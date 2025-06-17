@@ -735,8 +735,8 @@ let%expect_test "multiple polling_state_rpc" =
 
         let incoming t query =
           match Map.find t query with
-          | Some effect ->
-            let%bind.Effect result = effect in
+          | Some effct ->
+            let%bind.Effect result = effct in
             Effect.print_s ([%sexp_of: int Or_error.t] result)
           | None -> Effect.print_s [%message "Query does not exist in map" (query : int)]
         ;;
