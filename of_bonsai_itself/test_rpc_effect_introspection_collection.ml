@@ -804,8 +804,7 @@ module%test [@name "Normal Rpc.Rpc.dispatch"] _ = struct
             ((location "server-side rpc computation")
              (exn
               (monitor.ml.Error
-               (Failure "Disqualified: Jumped into the bleachers.")
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
+               (Failure "Disqualified: Jumped into the bleachers."))))))
           (connection_description <created-directly>) (rpc_name reverse-rpc)
           (rpc_version 1)))))
       |}];
@@ -822,14 +821,13 @@ module%test [@name "Normal Rpc.Rpc.dispatch"] _ = struct
             ((location "server-side rpc computation")
              (exn
               (monitor.ml.Error
-               (Failure "Disqualified: Jumped into the bleachers.")
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
+               (Failure "Disqualified: Jumped into the bleachers."))))))
           (connection_description <created-directly>) (rpc_name reverse-rpc)
           (rpc_version 1)))))
 
       State
       =========================
-      -1,25 +1,39
+      -1,25 +1,38
         ((0 (
            (rpc_kind (
              Normal
@@ -848,9 +846,8 @@ module%test [@name "Normal Rpc.Rpc.dispatch"] _ = struct
       +|           Uncaught_exn (
       +|             (location "server-side rpc computation")
       +|             (exn (
-      +|               monitor.ml.Error
-      +|               (Failure "Disqualified: Jumped into the bleachers.")
-      +|               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
+      +|               monitor.ml.Error (
+      +|                 Failure "Disqualified: Jumped into the bleachers."))))))
       +|         (connection_description <created-directly>)
       +|         (rpc_name               reverse-rpc)
       +|         (rpc_version            1))))))

@@ -475,9 +475,7 @@ module%test Streamable_rpc = struct
            ((rpc_error
              (Uncaught_exn
               ((location "server-side pipe_rpc computation")
-               (exn
-                (monitor.ml.Error (Failure "Error: Too many elements!!")
-                 ("Caught by monitor at file \"lib/streamable/src/state_rpc.ml\", line LINE, characters C1-C2"))))))
+               (exn (monitor.ml.Error (Failure "Error: Too many elements!!"))))))
             (connection_description <created-directly>)
             (rpc_name streamable-plain-rpc) (rpc_version 0)))))
         |}];
@@ -495,9 +493,7 @@ module%test Streamable_rpc = struct
            ((rpc_error
              (Uncaught_exn
               ((location "server-side pipe_rpc computation")
-               (exn
-                (monitor.ml.Error (Failure "Error: Too many elements!!")
-                 ("Caught by monitor at file \"lib/streamable/src/state_rpc.ml\", line LINE, characters C1-C2"))))))
+               (exn (monitor.ml.Error (Failure "Error: Too many elements!!"))))))
             (connection_description <created-directly>)
             (rpc_name streamable-plain-rpc) (rpc_version 0))))
          (inflight_query ((number_of_elements 42))))
@@ -513,9 +509,7 @@ module%test Streamable_rpc = struct
            ((rpc_error
              (Uncaught_exn
               ((location "server-side pipe_rpc computation")
-               (exn
-                (monitor.ml.Error (Failure "Error: Too many elements!!")
-                 ("Caught by monitor at file \"lib/streamable/src/state_rpc.ml\", line LINE, characters C1-C2"))))))
+               (exn (monitor.ml.Error (Failure "Error: Too many elements!!"))))))
             (connection_description <created-directly>)
             (rpc_name streamable-plain-rpc) (rpc_version 0)))))
         |}];
@@ -701,8 +695,7 @@ let%expect_test "BUG: completing an RPC at the same time as a disconnect" =
             ((location "server-side rpc computation")
              (exn
               (monitor.ml.Error
-               ("Ivar.fill_exn called on full ivar" (t (Full _)))
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+               ("Ivar.fill_exn called on full ivar" (t (Full _))))))))
           (connection_description <created-directly>)
           (rpc_name polling_state_rpc_a) (rpc_version 0)))))
       (inflight_query ()) (refresh <opaque>)))
@@ -2132,9 +2125,7 @@ module%test [@name "Polling_state_rpc.poll"] _ = struct
          ((rpc_error
            (Uncaught_exn
             ((location "server-side rpc computation")
-             (exn
-              (monitor.ml.Error ("Error response" (query 1))
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+             (exn (monitor.ml.Error ("Error response" (query 1)))))))
           (connection_description <created-directly>)
           (rpc_name polling_state_rpc_a) (rpc_version 0)))))
       |}];
@@ -2147,9 +2138,7 @@ module%test [@name "Polling_state_rpc.poll"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error ("Error response" (query 1))
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error ("Error response" (query 1)))))))
            (connection_description <created-directly>)
            (rpc_name polling_state_rpc_a) (rpc_version 0)))))
        (inflight_query ()) (refresh <opaque>))
@@ -2164,9 +2153,7 @@ module%test [@name "Polling_state_rpc.poll"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error ("Error response" (query 1))
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error ("Error response" (query 1)))))))
            (connection_description <created-directly>)
            (rpc_name polling_state_rpc_a) (rpc_version 0)))))
        (inflight_query ()) (refresh <opaque>))
@@ -2190,9 +2177,7 @@ module%test [@name "Polling_state_rpc.poll"] _ = struct
          ((rpc_error
            (Uncaught_exn
             ((location "server-side rpc computation")
-             (exn
-              (monitor.ml.Error ("Error response" (query 3))
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+             (exn (monitor.ml.Error ("Error response" (query 3)))))))
           (connection_description <created-directly>)
           (rpc_name polling_state_rpc_a) (rpc_version 0)))))
       |}];
@@ -2205,9 +2190,7 @@ module%test [@name "Polling_state_rpc.poll"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error ("Error response" (query 3))
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error ("Error response" (query 3)))))))
            (connection_description <created-directly>)
            (rpc_name polling_state_rpc_a) (rpc_version 0)))))
        (inflight_query ()) (refresh <opaque>))
@@ -2789,9 +2772,7 @@ module%test [@name "Rpc.poll"] _ = struct
          ((rpc_error
            (Uncaught_exn
             ((location "server-side rpc computation")
-             (exn
-              (monitor.ml.Error ("Error response" (query 1))
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+             (exn (monitor.ml.Error ("Error response" (query 1)))))))
           (connection_description <created-directly>) (rpc_name rpc)
           (rpc_version 0)))))
       |}];
@@ -2805,9 +2786,7 @@ module%test [@name "Rpc.poll"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error ("Error response" (query 1))
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error ("Error response" (query 1)))))))
            (connection_description <created-directly>) (rpc_name rpc)
            (rpc_version 0)))))
        (inflight_query ()) (refresh <opaque>))
@@ -2821,9 +2800,7 @@ module%test [@name "Rpc.poll"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error ("Error response" (query 1))
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error ("Error response" (query 1)))))))
            (connection_description <created-directly>) (rpc_name rpc)
            (rpc_version 0)))))
        (inflight_query (2)) (refresh <opaque>))
@@ -2847,9 +2824,7 @@ module%test [@name "Rpc.poll"] _ = struct
          ((rpc_error
            (Uncaught_exn
             ((location "server-side rpc computation")
-             (exn
-              (monitor.ml.Error ("Error response" (query 3))
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+             (exn (monitor.ml.Error ("Error response" (query 3)))))))
           (connection_description <created-directly>) (rpc_name rpc)
           (rpc_version 0)))))
       |}];
@@ -2862,9 +2837,7 @@ module%test [@name "Rpc.poll"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error ("Error response" (query 3))
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error ("Error response" (query 3)))))))
            (connection_description <created-directly>) (rpc_name rpc)
            (rpc_version 0)))))
        (inflight_query ()) (refresh <opaque>))
@@ -3235,9 +3208,7 @@ module%test [@name "Rpc.poll_until_ok"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error (Failure "too early!")
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error (Failure "too early!"))))))
            (connection_description <created-directly>) (rpc_name rpc)
            (rpc_version 0)))))
        (inflight_query ()))
@@ -3257,9 +3228,7 @@ module%test [@name "Rpc.poll_until_ok"] _ = struct
           ((rpc_error
             (Uncaught_exn
              ((location "server-side rpc computation")
-              (exn
-               (monitor.ml.Error (Failure "too early!")
-                ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/rpc_effect_tests.ml\", line LINE, characters C1-C2"))))))
+              (exn (monitor.ml.Error (Failure "too early!"))))))
            (connection_description <created-directly>) (rpc_name rpc)
            (rpc_version 0)))))
        (inflight_query ()))

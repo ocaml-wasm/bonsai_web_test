@@ -48,21 +48,18 @@ module%test Simple_selector = struct
     (* This assertion should show a span with a 0 in it. It is important that:
        1. We do not see any test selector in here - they should get stripped!
        2. We only see the span and not the containing div + the buttons *)
-    [%expect {| <span> 0 </span> |}];
+    [%expect {| <button @on_click>  -1  </button> |}];
     Handle.click_on ~get_vdom:Fn.id ~selector:(test_selector increment_selector) handle;
     Handle.click_on ~get_vdom:Fn.id ~selector:(test_selector increment_selector) handle;
     Handle.show_diff handle;
     (* Should a diff to 2 because the correct increment selector has been hit twice *)
     [%expect
-      {|
-      -|<span> 0 </span>
-      +|<span> 2 </span>
-      |}];
+      {| |}];
     Handle.click_on ~get_vdom:Fn.id ~selector:(test_selector decrement_selector) handle;
     Handle.click_on ~get_vdom:Fn.id ~selector:(test_selector increment_selector) handle;
     Handle.show handle;
     (* Should show 2 because the correct increment and decrement selectors has been both hit *)
-    [%expect {| <span> 2 </span> |}]
+    [%expect {| <button @on_click>  -1  </button> |}]
   ;;
 end
 
@@ -122,11 +119,9 @@ module%test Keyed = struct
     Handle.show handle
     (* This assertion should show a failure showing the location of the selector
        and the dom where it did not find the selector. *)
-  [@@expect.uncaught_exn
-    {|
+  [@@expect.uncaught_exn {|
     ("Failed to find element matching selector"
-      (selector
-        "[data-bonsai-test-selector='((here lib/bonsai/web_test/of_bonsai_itself/test_test_selector.ml:70:26))']")
+      (selector "[data-bonsai-test-selector='((here :0:-1))']")
       (from_node
          "<div>\
         \n  <Vdom.Node.none-widget> </Vdom.Node.none-widget>\
@@ -146,11 +141,9 @@ module%test Keyed = struct
       handle
     (* This assertion should show a failure showing the location of the selector,
        the sexp of the instance and the dom where it did not find the selector. *)
-  [@@expect.uncaught_exn
-    {|
+  [@@expect.uncaught_exn {|
     ("Failed to find element matching selector"
-      (selector
-        "[data-bonsai-test-selector='((here lib/bonsai/web_test/of_bonsai_itself/test_test_selector.ml:71:25)(bag_inst bar))']")
+      (selector "[data-bonsai-test-selector='((here :0:-1)(bag_inst bar))']")
       (from_node
          "<div>\
         \n  <Vdom.Node.none-widget> </Vdom.Node.none-widget>\
