@@ -829,7 +829,7 @@ module%test [@name "Normal Rpc.Rpc.dispatch"] _ = struct
              (exn
               (monitor.ml.Error
                (Failure "Disqualified: Jumped into the bleachers.")
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
+               ("Caught by monitor at file \"lib/bonsai_web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
           (connection_description <created-directly>) (rpc_name reverse-rpc)
           (rpc_version 1)))))
       |}];
@@ -849,7 +849,7 @@ module%test [@name "Normal Rpc.Rpc.dispatch"] _ = struct
              (exn
               (monitor.ml.Error
                (Failure "Disqualified: Jumped into the bleachers.")
-               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
+               ("Caught by monitor at file \"lib/bonsai_web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
           (connection_description <created-directly>) (rpc_name reverse-rpc)
           (rpc_version 1)))))
 
@@ -865,6 +865,7 @@ module%test [@name "Normal Rpc.Rpc.dispatch"] _ = struct
            (start_time "1970-01-01 00:00:00Z")
            (query (Sexp_of_provided corgi))
       -|   (status Running)
+      -|   (path   bonsai_path)))
       +|   (status (
       +|     Finished
       +|     (duration 30.000000001s)
@@ -876,11 +877,10 @@ module%test [@name "Normal Rpc.Rpc.dispatch"] _ = struct
       +|             (exn (
       +|               monitor.ml.Error
       +|               (Failure "Disqualified: Jumped into the bleachers.")
-      +|               ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
+      +|               ("Caught by monitor at file \"lib/bonsai_web_test/of_bonsai_itself/test_rpc_effect_introspection_collection.ml\", line LINE, characters C1-C2"))))))
       +|         (connection_description <created-directly>)
       +|         (rpc_name               reverse-rpc)
       +|         (rpc_version            1))))))
-      -|   (path   bonsai_path)))
       +|   (path          bonsai_path)
       +|   (response_size 272)))
          (1 (
