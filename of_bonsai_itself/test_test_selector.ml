@@ -127,7 +127,7 @@ module%test Keyed = struct
     {|
     ("Failed to find element matching selector"
       (selector
-        "[data-bonsai-test-selector='((here lib/bonsai/web_test/of_bonsai_itself/test_test_selector.ml:71:26))']")
+        "[data-bonsai-test-selector='((here lib/bonsai_web_test/of_bonsai_itself/test_test_selector.ml:71:26))']")
       (from_node
          "<div>\
         \n  <Vdom.Node.none-widget> </Vdom.Node.none-widget>\
@@ -151,7 +151,7 @@ module%test Keyed = struct
     {|
     ("Failed to find element matching selector"
       (selector
-        "[data-bonsai-test-selector='((here lib/bonsai/web_test/of_bonsai_itself/test_test_selector.ml:72:25)(bag_inst bar))']")
+        "[data-bonsai-test-selector='((here lib/bonsai_web_test/of_bonsai_itself/test_test_selector.ml:72:25)(bag_inst bar))']")
       (from_node
          "<div>\
         \n  <Vdom.Node.none-widget> </Vdom.Node.none-widget>\
