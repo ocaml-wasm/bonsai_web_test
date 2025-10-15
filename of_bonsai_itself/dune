@@ -12,6 +12,7 @@
    legacy_diffable async_kernel.persistent_connection_kernel
    polling_state_rpc re bonsai_web.rpc_effect_kernel streamable
    bonsai_concrete.ui_incr versioned_polling_state_rpc virtual_dom)
+ (inline_tests (flags -drop-tag no-js -drop-tag 64-bits-only -drop-tag no-wasm) (modes js wasm))
  (preprocess
   (pps ppx_jane ppx_pattern_bind bonsai.ppx_bonsai js_of_ocaml-ppx
     ppx_diff.ppx_diff ppx_html streamable.ppx)))

@@ -121,7 +121,7 @@ let%expect_test _ =
       (exn (
         monitor.ml.Error
         "not stable after 5 iterations"
-        ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/flush_async_and_bonsai_tests.ml\", line LINE, characters C1-C2")))
+        ("Caught by monitor at file \"lib/bonsai_web_test/of_bonsai_itself/flush_async_and_bonsai_tests.ml\", line LINE, characters C1-C2")))
       |}]
 ;;
 
@@ -148,6 +148,6 @@ let%expect_test _ =
       (exn (
         monitor.ml.Error
         "not stable after 5 iterations"
-        ("Caught by monitor at file \"lib/bonsai/web_test/of_bonsai_itself/flush_async_and_bonsai_tests.ml\", line LINE, characters C1-C2")))
+        ("Caught by monitor at file \"lib/bonsai_web_test/of_bonsai_itself/flush_async_and_bonsai_tests.ml\", line LINE, characters C1-C2")))
       |}]
 ;;
