@@ -49,12 +49,17 @@ let%expect_test "long chain of Value.map" =
   [%expect {| 1019 |}]
 ;;
 
-let%expect_test ("js: first long Value.map chain to fail" [@tags "js-only", "no-wasm"]) =
-  Expect_test_helpers_base.require_does_raise (fun () ->
-    let _ : _ Handle.t = run_long_chain_test ~n:(breaking_point + 1) in
-    ());
-  [%expect {| ("Stack overflow") |}]
-;;
+(* In release builds (BUILD_PROFILE=release), js_of_ocaml generates code with a different
+   stack usage, and this test fails with "node with too large height" instead of a stack
+   overflow. So we only run it in dev builds. *)
+module%debug _ = struct
+  let%expect_test ("js: first long Value.map chain to fail" [@tags "js-only", "no-wasm"]) =
+    Expect_test_helpers_base.require_does_raise (fun () ->
+      let _ : _ Handle.t = run_long_chain_test ~n:(breaking_point + 1) in
+      ());
+    [%expect {| ("Stack overflow") |}]
+  ;;
+end
 
 let%expect_test ("wasm: first long Value.map chain to fail" [@tags "wasm-only"]) =
   Expect_test_helpers_base.require_does_raise (fun () ->

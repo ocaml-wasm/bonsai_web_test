@@ -10,7 +10,8 @@ open! Async_rpc_kernel
 type t
 
 val create
-  :  connection_state:(Rpc.Connection.t -> 'conn_state)
+  :  ?on_conn_failure:Rpc_effect.On_conn_failure.t (** defaults to [Retry_until_success] *)
+  -> connection_state:(Rpc.Connection.t -> 'conn_state)
   -> 'conn_state Rpc.Implementation.t list
   -> t
 
@@ -25,4 +26,8 @@ val create'
 
 val connector : t -> Rpc_effect.Connector.t
 val kill_connection : t -> unit Deferred.t
+
+(** Trigger a failed connection attempt. Must be called after [kill_connection]. *)
+val fail_to_connect : t -> unit Deferred.t
+
 val next_connection : t -> unit Deferred.t

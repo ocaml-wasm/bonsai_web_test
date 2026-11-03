@@ -38,7 +38,7 @@ let%expect_test "recursive component" =
       ~attrs:[ Vdom.Attr.id path_text ]
       (Vdom.Node.textf "%s %d" label state
        :: Vdom.Node.button
-            ~attrs:[ Vdom.Attr.on_click (fun _ -> set_state (state + 1)) ]
+            ~attrs:[ Vdom.Attr.on_click_js_of_ocaml (fun _ -> set_state (state + 1)) ]
             [ Vdom.Node.text "+1" ]
        :: Map.data (children : _ Int.Map.t))
   in

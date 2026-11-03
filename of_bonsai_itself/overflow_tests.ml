@@ -20,7 +20,7 @@ let%expect_test ("Bonsai prints an error message if there is a stack overflow in
     {|
     Stack overflow inside of a bonsai computation is not supported! In a future release your app might crash.
     RangeError: Maximum call stack size exceeded
-    <truncated stack to preserve determinism between fast-build and fast-exe>
+    <truncated stack to preserve determinism between BUILD_PROFILE=dev and BUILD_PROFILE=release>
     |}]
 ;;
 
@@ -40,6 +40,6 @@ let%expect_test ("Bonsai actually stack overflows when an overflowed computation
     {|
     Stack overflow inside of a bonsai computation is not supported! In a future release your app might crash.
     RangeError: Maximum call stack size exceeded
-    <truncated stack to preserve determinism between fast-build and fast-exe>("Stack overflow")
+    <truncated stack to preserve determinism between BUILD_PROFILE=dev and BUILD_PROFILE=release>("Stack overflow")
     |}]
 ;;

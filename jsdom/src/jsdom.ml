@@ -378,7 +378,7 @@ module Handle_experimental = struct
     ?optimize
     ~document_starts_with_focus
     ~get_vdom
-    (computation : local_ Bonsai.graph -> a Bonsai.t)
+    (computation : Bonsai.graph @ local -> a Bonsai.t)
     =
     let document_has_focus = ref document_starts_with_focus in
     reset_global_state_for_startup ~here ~has_focus:(fun () -> !document_has_focus) ();
@@ -391,7 +391,6 @@ module Handle_experimental = struct
               Incr.return Bonsai_private.Instrumentation.Watching.Not_watching
           ; instrument_for_profiling =
               Incr.return Bonsai_private.Instrumentation.Profiling.Not_profiling
-          ; set_latest_graph_info = (fun _ -> ())
           ; computation_watcher_queue = Queue.create ()
           ; start_timer = (fun _ -> ())
           ; stop_timer = (fun () -> ())

@@ -5,7 +5,7 @@ open Bonsai_web_test
 open Bonsai_test_shared_for_testing_bonsai.Big_computation_regression_util
 
 let sexp_of_computation
-  : type a. ?optimize:bool -> (local_ Bonsai.graph -> a Bonsai.t) -> Sexp.t
+  : type a. ?optimize:bool -> (Bonsai.graph @ local -> a Bonsai.t) -> Sexp.t
   =
   fun ?(optimize = true) c ->
   Bonsai_private.top_level_handle c

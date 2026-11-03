@@ -41,7 +41,8 @@ let test computation =
 ;;
 
 module%test
-  [@name "Comparing node path lengths to demonstrate instrumentation slowness"] _ =
+  [@name "Comparing node path lengths to demonstrate instrumentation slowness"]
+  _ =
 struct
   let%expect_test "Proc Syntax" =
     test (For_proc.basic ~height:5 ~width:7);

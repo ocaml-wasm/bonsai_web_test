@@ -1206,7 +1206,7 @@ module%test [@name "Rpc_effect.Polling_state_rpc.dispatcher"] _ = struct
       ~sexp_of_response:sexp_of_string
       ?rpc_implementations
       ~dispatch:
-        (Rpc_effect.Polling_state_rpc.dispatcher
+        (Rpc_effect.Polling_state_rpc.Expert.dispatcher
            ~sexp_of_query:[%sexp_of: string]
            ~sexp_of_response:[%sexp_of: string]
            Rpcs.Polling_state_rpc.rpc_v1
@@ -1628,7 +1628,7 @@ struct
       ?rpc_implementations
       ~sexp_of_response:sexp_of_string
       ~dispatch:
-        (Rpc_effect.Polling_state_rpc.versioned_polling_state_dispatcher
+        (Rpc_effect.Polling_state_rpc.Expert.versioned_polling_state_dispatcher
            ~sexp_of_query:[%sexp_of: string]
            ~sexp_of_response:[%sexp_of: string]
            Rpcs.Polling_state_rpc.caller
@@ -2125,7 +2125,7 @@ module%test [@name "Rpc_effect.Polling_state_rpc.poll and babel_poll"] _ = struc
       =========================
       (Started (id 0)
        (rpc_kind
-        (Babel
+        (Babel_polling_state_rpc
          (descriptions
           (((name polling-state-rpc-reverse-rpc) (version 2))
            ((name polling-state-rpc-reverse-rpc) (version 1))))
@@ -2145,7 +2145,7 @@ module%test [@name "Rpc_effect.Polling_state_rpc.poll and babel_poll"] _ = struc
       +|((
       +|  0 (
       +|    (rpc_kind (
-      +|      Babel
+      +|      Babel_polling_state_rpc
       +|      (descriptions (
       +|        ((name polling-state-rpc-reverse-rpc) (version 2))
       +|        ((name polling-state-rpc-reverse-rpc) (version 1))))
@@ -2355,7 +2355,7 @@ module%test [@name "More interesting polling_state_rpc diffs"] _ = struct
       ?rpc_implementations
       ~sexp_of_response:[%sexp_of: Polling_state_rpc.Response.t]
       ~dispatch:
-        (Rpc_effect.Polling_state_rpc.dispatcher
+        (Rpc_effect.Polling_state_rpc.Expert.dispatcher
            ~sexp_of_query:[%sexp_of: string]
            ~sexp_of_response:[%sexp_of: Polling_state_rpc.Response.t]
            Polling_state_rpc.rpc
@@ -2554,7 +2554,8 @@ module%test [@name "More interesting polling_state_rpc diffs"] _ = struct
 end
 
 module%test
-  [@name "Rpc_effect.Rpc.poll_until_condition_met and babel_poll_until_condition_met"] _ =
+  [@name "Rpc_effect.Rpc.poll_until_condition_met and babel_poll_until_condition_met"]
+  _ =
 struct
   let create_until_condition_met_handle ?rpc_implementations () =
     Poller_handle.create

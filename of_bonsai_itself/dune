@@ -15,3 +15,8 @@
  (preprocess
   (pps ppx_jane ppx_pattern_bind bonsai.ppx_bonsai js_of_ocaml-ppx
     ppx_diff.ppx_diff ppx_html streamable.ppx)))
+
+(env
+ (_
+  (env-vars
+   (OCAMLPARAM w=-46,keywords=5.2,_))))

@@ -202,8 +202,18 @@ module%test [@name "Multiple custom [where_to_connect]s"] _ = struct
           in
           {%html|
             <div>
-              <button id="button1" on_click=%{print_on_click dispatcher1}>button1</button>
-              <button id="button2" on_click=%{print_on_click dispatcher2}>button2</button>
+              <button
+                id="button1"
+                on_click_js_of_ocaml=%{print_on_click dispatcher1}
+              >
+                button1
+              </button>
+              <button
+                id="button2"
+                on_click_js_of_ocaml=%{print_on_click dispatcher2}
+              >
+                button2
+              </button>
             </div>
           |})
     in
@@ -595,7 +605,7 @@ module%test Dynamic_where_to_connect = struct
   let%expect_test "PSRPC dispatcher" =
     let where_to_connect = Var.create First.where_to_connect in
     let computation =
-      Rpc_effect.Polling_state_rpc.dispatcher
+      Rpc_effect.Polling_state_rpc.Expert.dispatcher
         polling_state_rpc
         ~where_to_connect:(Var.value where_to_connect)
     in

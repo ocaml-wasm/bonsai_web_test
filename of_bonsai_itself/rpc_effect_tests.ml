@@ -557,7 +557,7 @@ let incrementing_polling_state_rpc_implementation ?(verbose = false) ?block_on (
 
 let%expect_test "polling_state_rpc" =
   let computation =
-    Rpc_effect.Polling_state_rpc.dispatcher
+    Rpc_effect.Polling_state_rpc.Expert.dispatcher
       polling_state_rpc
       ~where_to_connect:
         (Value.return
@@ -723,7 +723,7 @@ let%expect_test "multiple polling_state_rpc" =
     let open Bonsai.Let_syntax in
     Bonsai.assoc (module Int) map ~f:(fun key _data ->
       let%sub dispatcher =
-        Rpc_effect.Polling_state_rpc.dispatcher
+        Rpc_effect.Polling_state_rpc.Expert.dispatcher
           polling_state_rpc
           ~where_to_connect:
             (Value.return
@@ -893,7 +893,7 @@ let%expect_test "disconnect and re-connect with polling_state_rpc" =
       [ incrementing_polling_state_rpc_implementation () ]
   in
   let computation =
-    Rpc_effect.Polling_state_rpc.dispatcher
+    Rpc_effect.Polling_state_rpc.Expert.dispatcher
       polling_state_rpc
       ~where_to_connect:
         (Value.return
@@ -973,10 +973,11 @@ module Babel_psrpcs = struct
 
   let implementations rpcs =
     let implement (Erased_implementation.T { rpc; latest_result_of_int }) =
+      let (module Response) = Polling_state_rpc.Expert.For_tests.response_module rpc in
       let impl =
         Polling_state_rpc.Expert.Implementation.create
           ~on_client_and_server_out_of_sync:print_s
-          ~response:(Polling_state_rpc.Expert.For_tests.response_module rpc)
+          ~response:(module Response)
           ~query_equal:(Polling_state_rpc.Expert.For_tests.query_equal rpc)
           (fun (_ : Rpc.Connection.t) `Authorized query ->
              let rpc = Polling_state_rpc.Expert.description rpc in
@@ -1043,7 +1044,7 @@ module%test [@name "babel polling state rpc"] _ = struct
       let%sub dispatch =
         match%sub Bonsai.Var.value activated with
         | true ->
-          Rpc_effect.Polling_state_rpc.babel_dispatcher
+          Rpc_effect.Polling_state_rpc.Expert.babel_dispatcher
             caller
             ~where_to_connect:
               (Value.return
@@ -1357,7 +1358,7 @@ module%test [@name "versioned polling state rpc"] _ = struct
       let%sub dispatch =
         match%sub Bonsai.Var.value activated with
         | true ->
-          Rpc_effect.Polling_state_rpc.versioned_polling_state_dispatcher
+          Rpc_effect.Polling_state_rpc.Expert.versioned_polling_state_dispatcher
             caller
             ~where_to_connect:
               (Value.return
@@ -3430,6 +3431,202 @@ module%test [@name "Rpc.poll"] _ = struct
   ;;
 end
 
+module Poll_until_response_spec = struct
+  type t = (int, int) Rpc_effect.Poll_result.Legacy_record.t
+  type incoming = Refresh
+
+  let view
+    { Rpc_effect.Poll_result.Legacy_record.last_ok_response
+    ; last_error
+    ; inflight_query
+    ; refresh = _
+    }
+    =
+    Sexp.to_string_hum
+      [%message
+        (last_ok_response : (int * int) option)
+          (last_error : (int * Error.t) option)
+          (inflight_query : int option)]
+  ;;
+
+  let incoming
+    { Rpc_effect.Poll_result.Legacy_record.last_ok_response = _
+    ; last_error = _
+    ; inflight_query = _
+    ; refresh
+    }
+    Refresh
+    =
+    refresh
+  ;;
+end
+
+module%test [@name "Polling_state_rpc.Expert.poll_until"] _ = struct
+  let computation ~condition query (local_ graph) =
+    let computation =
+      match condition with
+      | None ->
+        Rpc_effect.Polling_state_rpc.Expert.poll_until_ok
+          ~retry_interval:(Value.return (Time_ns.Span.of_sec 1.0))
+      | Some condition ->
+        Rpc_effect.Polling_state_rpc.Expert.poll_until_condition_met
+          ~every:(Value.return (Time_ns.Span.of_sec 1.0))
+          ~condition:(Value.return condition)
+    in
+    computation
+      ~sexp_of_query:[%sexp_of: Int.t]
+      ~sexp_of_response:[%sexp_of: Int.t]
+      ~equal_query:[%equal: Int.t]
+      ~equal_response:[%equal: Int.t]
+      polling_state_rpc
+      ~where_to_connect:
+        (Value.return
+           (Rpc_effect.Where_to_connect.self ~on_conn_failure:Retry_until_success ()))
+      ~output_type:Legacy_record
+      query
+      graph
+  ;;
+
+  let create ~condition =
+    let query = Bonsai.Var.create 1 in
+    let handle =
+      Handle.create
+        ~rpc_implementations:[ incrementing_polling_state_rpc_implementation () ]
+        (module Poll_until_response_spec)
+        (fun graph -> computation ~condition (Bonsai.Var.value query) graph)
+    in
+    query, handle
+  ;;
+
+  let advance_and_show handle =
+    Handle.advance_clock_by handle (Time_ns.Span.of_sec 1.0);
+    let%bind () = Async_kernel_scheduler.yield_until_no_jobs_remain () in
+    (* The clock only triggers after this frame is recomputed. *)
+    Handle.recompute_view handle;
+    let%bind () = Async_kernel_scheduler.yield_until_no_jobs_remain () in
+    Handle.show handle;
+    return ()
+  ;;
+
+  let%expect_test "poll_until_ok stops after an ok response and resumes for a new query" =
+    let query, handle = create ~condition:None in
+    let%bind () = async_recompute_view handle in
+    let%bind () = async_show handle in
+    [%expect
+      {|
+      ("For first request" (query 1))
+      ((last_ok_response ((1 1))) (last_error ()) (inflight_query ()))
+      |}];
+    let%bind () = advance_and_show handle in
+    [%expect {| ((last_ok_response ((1 1))) (last_error ()) (inflight_query ())) |}];
+    Bonsai.Var.set query 2;
+    Handle.recompute_view handle;
+    let%bind () = Async_kernel_scheduler.yield_until_no_jobs_remain () in
+    [%expect
+      {|
+      ("For first request" (query 2))
+      ("Computing diff" (from 1) (to_ 4))
+      |}];
+    Handle.show handle;
+    [%expect {| ((last_ok_response ((2 4))) (last_error ()) (inflight_query ())) |}];
+    let%bind () = advance_and_show handle in
+    [%expect {| ((last_ok_response ((2 4))) (last_error ()) (inflight_query ())) |}];
+    return ()
+  ;;
+
+  let%expect_test "poll_until_condition_met stops after the condition is met" =
+    let query, handle =
+      create
+        ~condition:
+          (Some (fun response -> if response >= 2 then `Stop_polling else `Continue))
+    in
+    let%bind () = async_recompute_view handle in
+    let%bind () = async_show handle in
+    [%expect
+      {|
+      ("For first request" (query 1))
+      ((last_ok_response ((1 1))) (last_error ()) (inflight_query ()))
+      |}];
+    let%bind () = advance_and_show handle in
+    let%bind () = Async_kernel_scheduler.yield_until_no_jobs_remain () in
+    Handle.show handle;
+    [%expect
+      {|
+      ((last_ok_response ((1 1))) (last_error ()) (inflight_query (1)))
+      ("Computing diff" (from 1) (to_ 2))
+      ((last_ok_response ((1 2))) (last_error ()) (inflight_query ()))
+      |}];
+    let%bind () = advance_and_show handle in
+    [%expect {| ((last_ok_response ((1 2))) (last_error ()) (inflight_query ())) |}];
+    let%bind () = advance_and_show handle in
+    [%expect {| ((last_ok_response ((1 2))) (last_error ()) (inflight_query ())) |}];
+    Bonsai.Var.set query 2;
+    Handle.recompute_view handle;
+    let%bind () = Async_kernel_scheduler.yield_until_no_jobs_remain () in
+    [%expect
+      {|
+      ("For first request" (query 2))
+      ("Computing diff" (from 2) (to_ 6))
+      |}];
+    Handle.show handle;
+    [%expect {| ((last_ok_response ((2 6))) (last_error ()) (inflight_query ())) |}];
+    let%bind () = advance_and_show handle in
+    [%expect {| ((last_ok_response ((2 6))) (last_error ()) (inflight_query ())) |}];
+    return ()
+  ;;
+
+  let%expect_test "poll_until isn't affected by forgetting" =
+    let conn =
+      Interruptible_persistent_connection.create
+        ~connection_state:Fn.id
+        [ incrementing_polling_state_rpc_implementation ~verbose:true () ]
+    in
+    let query = Bonsai.Var.create 1 in
+    let condition =
+      Some (fun response -> if response >= 2 then `Stop_polling else `Continue)
+    in
+    let handle =
+      Handle.create
+        ~connectors:(fun _ -> Interruptible_persistent_connection.connector conn)
+        (module Poll_until_response_spec)
+        (fun graph -> computation ~condition (Bonsai.Var.value query) graph)
+    in
+    let%bind () = async_recompute_view handle in
+    let%bind () = async_show handle in
+    [%expect
+      {|
+      ("server received rpc" (query 1))
+      ("For first request" (query 1))
+      ("server responding to rpc" (query 1) (response 1))
+      ((last_ok_response ((1 1))) (last_error ()) (inflight_query ()))
+      |}];
+    (* The connection is lost and restored while the condition is not met. In this case,
+       the server forgets the client state, and a fresh response is generated. *)
+    let%bind () = Interruptible_persistent_connection.kill_connection conn in
+    let%bind () = Interruptible_persistent_connection.next_connection conn in
+    let%bind () = advance_and_show handle in
+    let%bind () = Async_kernel_scheduler.yield_until_no_jobs_remain () in
+    Handle.show handle;
+    [%expect
+      {|
+      ((last_ok_response ((1 1))) (last_error ()) (inflight_query (1)))
+      ("server received rpc" (query 1))
+      ("For first request" (query 1))
+      ("server responding to rpc" (query 1) (response 2))
+      ((last_ok_response ((1 2))) (last_error ()) (inflight_query ()))
+      |}];
+    let%bind () = advance_and_show handle in
+    [%expect {| ((last_ok_response ((1 2))) (last_error ()) (inflight_query ())) |}];
+    (* The connection is lost and restored after the condition is met. We still don't send
+       a new query. *)
+    let%bind () = Interruptible_persistent_connection.kill_connection conn in
+    let%bind () = Interruptible_persistent_connection.next_connection conn in
+    let%bind () = advance_and_show handle in
+    [%expect {| ((last_ok_response ((1 2))) (last_error ()) (inflight_query ())) |}];
+    return ()
+  ;;
+end
+
 module%test [@name "Rpc.poll_until_ok"] _ = struct
   let rpc =
     Rpc.Rpc.create
@@ -3452,36 +3649,6 @@ module%test [@name "Rpc.poll_until_ok"] _ = struct
       return (query * !count))
   ;;
 
-  module Result_spec = struct
-    type t = (int, int) Rpc_effect.Poll_result.Legacy_record.t
-    type incoming = Refresh
-
-    let view
-      { Rpc_effect.Poll_result.Legacy_record.last_ok_response
-      ; last_error
-      ; inflight_query
-      ; refresh = _
-      }
-      =
-      Sexp.to_string_hum
-        [%message
-          (last_ok_response : (int * int) option)
-            (last_error : (int * Error.t) option)
-            (inflight_query : int option)]
-    ;;
-
-    let incoming
-      { Rpc_effect.Poll_result.Legacy_record.last_ok_response = _
-      ; last_error = _
-      ; inflight_query = _
-      ; refresh
-      }
-      Refresh
-      =
-      refresh
-    ;;
-  end
-
   let%expect_test "Stops polling after first response" =
     let input_var = Bonsai.Var.create 1 in
     let computation =
@@ -3501,7 +3668,7 @@ module%test [@name "Rpc.poll_until_ok"] _ = struct
     let handle =
       Handle.create
         ~rpc_implementations:[ returns_ok_after ~iterations:0 ]
-        (module Result_spec)
+        (module Poll_until_response_spec)
         computation
     in
     let%bind () = async_show handle in
@@ -3554,7 +3721,7 @@ module%test [@name "Rpc.poll_until_ok"] _ = struct
     let handle =
       Handle.create
         ~rpc_implementations:[ returns_ok_after ~iterations:2 ]
-        (module Result_spec)
+        (module Poll_until_response_spec)
         computation
     in
     let%bind () = async_show handle in
@@ -3639,7 +3806,7 @@ module%test [@name "Rpc.poll_until_ok"] _ = struct
     let handle =
       Handle.create
         ~rpc_implementations:[ returns_ok_after ~iterations:0 ]
-        (module Result_spec)
+        (module Poll_until_response_spec)
         computation
     in
     let%bind () = async_show handle in

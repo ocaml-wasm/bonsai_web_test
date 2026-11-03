@@ -25,7 +25,7 @@ module Handle_experimental : sig
          (** [get_vdom] should retrieve vdom from the computed component. It should not do
              any meaningful work or transformations over the vdom. Most use cases should
              be [Fn.id], or maybe [fst], [snd], getting a record field, etc. *)
-    -> (local_ Bonsai.graph -> 'a Bonsai.t)
+    -> (Bonsai.graph @ local -> 'a Bonsai.t)
     -> ('a t -> unit)
     -> unit
 
@@ -45,7 +45,7 @@ module Handle_experimental : sig
          (** [get_vdom] should retrieve vdom from the computed component. It should not do
              any meaningful work or transformations over the vdom. Most use cases should
              be [Fn.id], or maybe [fst], [snd], getting a record field, etc. *)
-    -> (local_ Bonsai.graph -> 'a Bonsai.t)
+    -> (Bonsai.graph @ local -> 'a Bonsai.t)
     -> ('a t -> unit Deferred.t)
     -> unit Deferred.t
 

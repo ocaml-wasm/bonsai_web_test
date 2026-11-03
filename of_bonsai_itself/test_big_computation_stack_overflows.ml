@@ -54,12 +54,17 @@ module%test Stack_overflow_during_handle_create = struct
       ())
   ;;
 
-  let%expect_test ("JSOO - Stack overflow during handle creation"
-    [@tags "js-only", "no-wasm"])
-    =
-    test ~n:depth ();
-    [%expect {| ("Stack overflow") |}]
-  ;;
+  (* In release builds (BUILD_PROFILE=release), js_of_ocaml generates code with a
+     different stack usage, and this test fails with "node with too large height" instead
+     of a stack overflow. So we only run it in dev builds. *)
+  module%debug _ = struct
+    let%expect_test ("JSOO - Stack overflow during handle creation"
+      [@tags "js-only", "no-wasm"])
+      =
+      test ~n:depth ();
+      [%expect {| ("Stack overflow") |}]
+    ;;
+  end
 
   let why_is_the_above_test_stack_overflowing () =
     try

@@ -71,7 +71,7 @@ module Handle : sig
              [rpc_implementations] to handle any dispatched RPCs. *)
     -> ?start_time:Time_ns.t
     -> ?optimize:bool
-    -> (local_ Bonsai.graph -> 'a Bonsai.t)
+    -> (Bonsai.graph @ local -> 'a Bonsai.t)
     -> ('a, 'b) t
 
   (** {v
